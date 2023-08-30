@@ -3,7 +3,7 @@
 }
 
 a {
-    color: darkgrey;
+    color: white;
 }
 
 .container {
@@ -18,7 +18,7 @@ a {
     box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
     max-width: 492px;
     width: 95%;
-    background-color: rgb(26, 26, 28) !important;
+    background-color: rgb(1, 81, 175) !important;
     border-radius: 8px;
     height: fit-content;
 }
@@ -40,7 +40,7 @@ a {
     background-position: center;
     background-repeat: no-repeat;
     background-size: 340px;
-    background-color: rgb(26, 26, 28);
+    background-color: rgb(1, 81, 175);
     border-radius: 8px;
     height: 140px;
 }
@@ -72,7 +72,7 @@ a {
 }
 
 .rate-limit-text {
-    color: grey;
+    color: white;
     font-size: 13px;
     font-weight: 300;
     word-break: break-word;
@@ -90,7 +90,7 @@ a {
     align-items: center;
     color: #333;
     height: 45px;
-    background-color: rgb(43, 43, 43);
+    background-color: #333;
     margin-bottom: 8px;
     border-radius: 5px;
 }
@@ -172,7 +172,7 @@ a {
 .bold-text {
     font-size: small;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.536);
+    color: #f9eddd;
 }
 
 .back-button {

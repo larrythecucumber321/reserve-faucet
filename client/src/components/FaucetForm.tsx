@@ -528,12 +528,12 @@ const FaucetForm = (props: any) => {
         <div className="box-content">
           <div className="box-header">
             <span>
-              <span style={{ color: "grey" }}>Select Network</span>
+              <span style={{ color: "#f9eddd" }}>Select Network</span>
             </span>
             <ChainDropdown /> <br />
             <div>
               <div style={{ width: "100%" }}>
-                <span style={{ color: "grey", fontSize: "12px" }}>
+                <span style={{ color: "#f9eddd", fontSize: "13px" }}>
                   Faucet Provides:{" "}
                 </span>
 
@@ -559,13 +559,13 @@ const FaucetForm = (props: any) => {
           <div
             style={{ display: sendTokenResponse?.txHash ? "none" : "block" }}
           >
-            <p className="rate-limit-text">
+            {/* <p className="rate-limit-text">
               Drops are limited to
               <span>
                 {chainConfigs[token!]?.RATELIMIT?.MAX_LIMIT} request in{" "}
                 {toString(chainConfigs[token!]?.RATELIMIT?.WINDOW_SIZE)}.
               </span>
-            </p>
+            </p> */}
 
             <div className="address-input">
               <input
