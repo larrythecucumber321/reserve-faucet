@@ -33,6 +33,11 @@ const FaucetForm = (props: any) => {
     message: null,
   });
 
+  const [twitterLink, setTwitterLink] = useState<string>("");
+
+  const preWrittenTweet =
+    "Excited to mint @reserveprotocol RTokens on @BuildOnBase! \n \nGrabbing myself some free faucet funds at https://faucet.reserve.org";
+
   // Update chain configs
   useEffect(() => {
     setRecaptcha(
@@ -125,11 +130,7 @@ const FaucetForm = (props: any) => {
           &nbsp;
           <a
             target={"_blank"}
-            href={
-              chainConfigs[token!]?.EXPLORER +
-              "/address/" +
-              chain.CONTRACTADDRESS
-            }
+            href={chain.EXPLORER + "/address/" + chain.CONTRACTADDRESS}
             rel="noreferrer"
           >
             {chain.NAME}{" "}
@@ -500,23 +501,31 @@ const FaucetForm = (props: any) => {
     });
   };
 
-  const toString = (mins: number): string => {
-    if (mins < 60) {
-      return `${mins} minute${mins > 1 ? "s" : ""}`;
-    } else {
-      const hour = ~~(mins / 60);
-      const minute = mins % 60;
-
-      if (minute == 0) {
-        return `${hour} hour${hour > 1 ? "s" : ""}`;
-      } else {
-        return `${hour} hour${hour > 1 ? "s" : ""} and ${minute} minute${
-          minute > 1 ? "s" : ""
-        }`;
-      }
-    }
+  const handleTweet = () => {
+    const tweetLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+      preWrittenTweet
+    )}`;
+    window.open(tweetLink, "_blank");
   };
 
+  const verifyTweet = async () => {
+    try {
+      const response = await props.axios.post(props.config.api.verifyTweet, {
+        tweetLink: twitterLink,
+        preWrittenTweet,
+      });
+
+      if (response.data.verified) {
+        console.log("yayyy it works");
+        // Handle successful verification e.g., allow the sendToken action
+      } else {
+        console.log("verification failed");
+        // Handle verification failure
+      }
+    } catch (error) {
+      console.error("Error verifying tweet:", error);
+    }
+  };
   return (
     <div className="container">
       <div className="box">
@@ -525,6 +534,21 @@ const FaucetForm = (props: any) => {
           style={{ backgroundImage: `url(${props.config.banner})` }}
         />
 
+        <div>
+          <p>Step 1: Tweet the following content on your Twitter:</p>
+          <textarea readOnly value={preWrittenTweet}></textarea>
+          <button onClick={handleTweet}>Tweet</button>
+        </div>
+        <div>
+          <p>Step 2: Paste the link to your tweet below:</p>
+          <input
+            type="text"
+            value={twitterLink}
+            onChange={(e) => setTwitterLink(e.target.value)}
+            placeholder="Twitter post link..."
+          />
+          <button onClick={verifyTweet}>Verify</button>
+        </div>
         <div className="box-content">
           <div className="box-header">
             <span>

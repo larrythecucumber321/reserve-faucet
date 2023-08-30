@@ -1,9 +1,10 @@
 import express from "express";
-import bodyParser from "body-parser";
 import cors from "cors";
 import path from "path";
 import dotenv from "dotenv";
 import { BN } from "avalanche";
+import { URL } from "url";
+import { Client } from "twitter-api-sdk";
 
 import { RateLimiter, VerifyCaptcha, parseBody, parseURI } from "./middlewares";
 import EVM from "./vms/evm";
@@ -24,6 +25,8 @@ import {
 } from "./config.json";
 
 dotenv.config();
+
+const twitterClient = new Client(process.env.TWITTER_BEARER_TOKEN!);
 
 const app: any = express();
 const router: any = express.Router();
@@ -92,7 +95,6 @@ evmchains.forEach((chain: ChainType): void => {
     config: chain,
     instance: chainInstance,
   });
-  console.log(evms);
 });
 
 // Adding ERC20 token contracts to their HOST evm instances
@@ -107,6 +109,36 @@ erc20tokens.forEach((token: ERC20Type, i: number): void => {
   )!;
 
   evm?.instance.addERC20Contract(token);
+});
+
+router.post("/verifyTweet", async (req: any, res: any) => {
+  try {
+    const tweetLink = req.body.tweetLink;
+    const urlObj = new URL(tweetLink);
+    const pathSegments = urlObj.pathname.split("/");
+    const tweetId = pathSegments[pathSegments.length - 1];
+
+    const { data } = await twitterClient.tweets.findTweetById(tweetId);
+
+    const firstLineOfPreWrittenTweet = req.body.preWrittenTweet
+      .split("\n")[0]
+      .trim();
+
+    if (data?.text.includes(firstLineOfPreWrittenTweet)) {
+      res
+        .status(200)
+        .send({ verified: true, message: "Tweet verified successfully!" });
+    } else {
+      res.status(200).send({
+        verified: false,
+        message: "Provided tweet does not match.",
+      });
+    }
+  } catch (err) {
+    console.log("errored", err);
+    console.error("Error in /verifyTweet:", err);
+    res.status(500).send({ verified: false, message: "Server error." });
+  }
 });
 
 // POST request for sending tokens or coins
