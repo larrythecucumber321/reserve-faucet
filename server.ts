@@ -92,6 +92,7 @@ evmchains.forEach((chain: ChainType): void => {
     config: chain,
     instance: chainInstance,
   });
+  console.log(evms);
 });
 
 // Adding ERC20 token contracts to their HOST evm instances

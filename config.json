@@ -27,7 +27,8 @@
       "RATELIMIT": {
         "MAX_LIMIT": 1,
         "WINDOW_SIZE": 0
-      }
+      },
+      "MULTI_SEND": "0xea710720Cb695EcbEcF1E70bF0CEaeb21cbFC2ad"
     }
   ],
   "erc20tokens": [

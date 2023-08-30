@@ -40,6 +40,7 @@ export type ChainType = {
     WINDOW_SIZE: number;
     MAX_LIMIT: number;
   };
+  MULTI_SEND: string;
 };
 
 export type ERC20Type = {
