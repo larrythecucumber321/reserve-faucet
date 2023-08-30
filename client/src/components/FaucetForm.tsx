@@ -533,21 +533,32 @@ const FaucetForm = (props: any) => {
           className="banner"
           style={{ backgroundImage: `url(${props.config.banner})` }}
         />
-
-        <div>
-          <p>Step 1: Tweet the following content on your Twitter:</p>
-          <textarea readOnly value={preWrittenTweet}></textarea>
-          <button onClick={handleTweet}>Tweet</button>
-        </div>
-        <div>
-          <p>Step 2: Paste the link to your tweet below:</p>
-          <input
-            type="text"
-            value={twitterLink}
-            onChange={(e) => setTwitterLink(e.target.value)}
-            placeholder="Twitter post link..."
-          />
-          <button onClick={verifyTweet}>Verify</button>
+        <div className="box-content">
+          <div>
+            <p className="tweet-step-instruction">
+              Step 1: Tweet the following content:
+            </p>
+            <button onClick={handleTweet} className="tweet-button">
+              Tweet
+            </button>
+          </div>
+          <div>
+            <p className="tweet-step-instruction">
+              Step 2: Paste the link to your tweet to verify:
+            </p>
+            <div className="address-input">
+              <input
+                type="text"
+                value={twitterLink}
+                onChange={(e) => setTwitterLink(e.target.value)}
+                placeholder="Twitter post link..."
+                className="twitter-link-input"
+              />
+            </div>
+            <button onClick={verifyTweet} className="verify-button">
+              Verify
+            </button>
+          </div>
         </div>
         <div className="box-content">
           <div className="box-header">
@@ -610,12 +621,6 @@ const FaucetForm = (props: any) => {
             <span className="rate-limit-text" style={{ color: "red" }}>
               {sendTokenResponse?.message}
             </span>
-
-            <div className="v2-recaptcha" style={{ marginTop: "10px" }}></div>
-
-            <div className="beta-alert">
-              <p>This is a testnet faucet. Funds are not real.</p>
-            </div>
 
             <button
               className={

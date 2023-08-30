@@ -191,3 +191,38 @@ a {
 .back-button:hover {
     background-color: #333;
 }
+
+.tweet-step-instruction {
+    color: #f9eddd;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.tweet-textarea {
+    width: 100%;
+    height: 100px;
+    margin-bottom: 10px;
+    border: 1px solid #333;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-radius: 4px;
+    resize: none;
+}
+
+.tweet-button, .verify-button {
+    color:white;
+    height: 36px;
+    width: 100%;
+    padding: 0 16px;
+    border: 0px;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+    text-transform: uppercase;
+    margin-top: 10px;
+}
+
+.tweet-button:hover, .verify-button:hover {
+    background-color: #333;
+}
+
