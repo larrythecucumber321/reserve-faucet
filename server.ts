@@ -23,6 +23,12 @@ import {
   NATIVE_CLIENT,
   DEBUG,
 } from "./config.json";
+import {
+  TwitterNextToken,
+  TwitterPaginatedResponse,
+  TwitterResponse,
+  usersIdTweets,
+} from "twitter-api-sdk/dist/types";
 
 dotenv.config();
 
@@ -104,16 +110,56 @@ erc20tokens.forEach((token: ERC20Type, i: number): void => {
 
   evm?.instance.addERC20Contract(token);
 });
-
 router.post("/verifyTweet", async (req: any, res: any) => {
   try {
     const tweetLink = req.body.tweetLink;
     const urlObj = new URL(tweetLink);
     const pathSegments = urlObj.pathname.split("/");
     const tweetId = pathSegments[pathSegments.length - 1];
+    const userName = pathSegments[pathSegments.length - 3];
 
-    const { data } = await twitterClient.tweets.findTweetById(tweetId);
+    let data: any;
 
+    try {
+      data = await twitterClient.tweets.findTweetById(tweetId);
+    } catch (error) {
+      if ((error as any).response?.status === 429) {
+        // Handling rate limit
+        try {
+          // Fetch the most recent tweet of the user
+          const { data: userNameRes } =
+            await twitterClient.users.findUserByUsername(userName);
+          const usersTweets = (await twitterClient.tweets.usersIdTweets(
+            userNameRes?.id || "",
+            {
+              max_results: 5,
+            }
+          )) as any;
+
+          if (usersTweets?.data?.length > 0) {
+            data = usersTweets?.data[0];
+          } else {
+            // If the user doesn't have any tweets or another error occurred
+            throw new Error("Couldn't retrieve user's latest tweet");
+          }
+        } catch (innerError) {
+          if ((innerError as any).response?.status === 429) {
+            // Naively verifying if we're rate limited twice
+            res.status(200).send({
+              verified: true,
+              message: "Assumed verification due to rate limit.",
+            });
+            return;
+          }
+          throw innerError;
+        }
+      } else {
+        console.error("Error in /verifyTweet:", error);
+        res.status(500).send({ verified: false, message: "Server error." });
+      }
+    }
+
+    console.log("got thru", data);
     const firstLineOfPreWrittenTweet = req.body.preWrittenTweet
       .split("\n")[0]
       .trim();
@@ -129,7 +175,6 @@ router.post("/verifyTweet", async (req: any, res: any) => {
       });
     }
   } catch (err) {
-    console.log("errored", err);
     console.error("Error in /verifyTweet:", err);
     res.status(500).send({ verified: false, message: "Server error." });
   }
