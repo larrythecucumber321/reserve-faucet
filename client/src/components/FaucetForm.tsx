@@ -4,7 +4,6 @@ import { ClipLoader } from "react-spinners";
 import Select from "react-select";
 
 import "./styles/FaucetForm.css";
-import ReCaptcha from "./ReCaptcha";
 import FooterBox from "./FooterBox";
 import queryString from "query-string";
 import { DropdownOption } from "./types";
@@ -15,7 +14,6 @@ const FaucetForm = (props: any) => {
   const [chain, setChain] = useState<number | null>(null);
   const [token, setToken] = useState<number | null>(null);
   const [widgetID, setwidgetID] = useState(new Map());
-  const [recaptcha, setRecaptcha] = useState<ReCaptcha | undefined>(undefined);
   const [isV2, setIsV2] = useState<boolean>(false);
   const [chainConfigs, setChainConfigs] = useState<any>([]);
   const [inputAddress, setInputAddress] = useState<string>("");
@@ -33,6 +31,12 @@ const FaucetForm = (props: any) => {
     message: null,
   });
 
+  const [verified, setVerified] = useState<boolean>(false);
+  const [verificationStatus, setVerificationStatus] = useState<any>({
+    err: false,
+    verified: false,
+  });
+
   const [twitterLink, setTwitterLink] = useState<string>("");
 
   const preWrittenTweet =
@@ -40,22 +44,9 @@ const FaucetForm = (props: any) => {
 
   // Update chain configs
   useEffect(() => {
-    setRecaptcha(
-      new ReCaptcha(
-        props.config.SITE_KEY,
-        props.config.ACTION,
-        props.config.V2_SITE_KEY,
-        setwidgetID
-      )
-    );
     updateChainConfigs();
     connectAccount(updateAddress, false);
   }, []);
-
-  // Update balance whenver chain changes or after transaction is processed
-  useEffect(() => {
-    updateBalance();
-  }, [chain, token, sendTokenResponse, chainConfigs]);
 
   // Make REQUEST button disabled if either address is not valid or balance is low
   useEffect(() => {
@@ -219,34 +210,6 @@ const FaucetForm = (props: any) => {
     return params;
   }
 
-  async function updateBalance(): Promise<void> {
-    // Abort pending requests
-    const controller = new AbortController();
-    if (isFetchingBalance) {
-      isFetchingBalance.abort();
-    }
-    setIsFetchingBalance(controller);
-
-    if ((chain || chain == 0) && chainConfigs.length > 0) {
-      let { chain, erc20 } = getChainParams();
-
-      const response: AxiosResponse = await props.axios.get(
-        props.config.api.getBalance,
-        {
-          params: {
-            chain,
-            erc20,
-          },
-          signal: controller.signal,
-        }
-      );
-
-      if (response?.data?.balance || response?.data?.balance == 0) {
-        setBalance(response?.data?.balance);
-      }
-    }
-  }
-
   async function updateFaucetAddress(): Promise<void> {
     if ((chain || chain == 0) && chainConfigs.length > 0) {
       let { chain } = getChainParams();
@@ -274,17 +237,6 @@ const FaucetForm = (props: any) => {
       amount += "0";
     }
     return BigInt(amount);
-  }
-
-  function calculateLargestUnit(
-    amount: string = "0",
-    decimals: number = 18
-  ): string {
-    let base = "1";
-    for (let i = 0; i < decimals; i++) {
-      base += "0";
-    }
-    return (BigInt(amount) / BigInt(base)).toString();
   }
 
   function chainToIndex(id: any): number | null {
@@ -318,13 +270,6 @@ const FaucetForm = (props: any) => {
     }
   }
 
-  async function getCaptchaToken(
-    index: number = 0
-  ): Promise<{ token?: string; v2Token?: string }> {
-    const { token, v2Token } = await recaptcha!.getToken(isV2, widgetID, index);
-    return { token, v2Token };
-  }
-
   function updateChain(option: any): void {
     let chainNum: number = option.value;
 
@@ -334,33 +279,6 @@ const FaucetForm = (props: any) => {
     }
   }
 
-  function updateToken(option: any): void {
-    let tokenNum: number = option.value;
-
-    if (tokenNum >= 0 && tokenNum < chainConfigs.length) {
-      setToken(tokenNum);
-      back();
-    }
-  }
-
-  const ifCaptchaFailed = (
-    data: any,
-    index: number = 0,
-    reload: boolean = false
-  ) => {
-    if (typeof data?.message == "string") {
-      if (data.message.includes("Captcha verification failed")) {
-        setIsV2(true);
-        recaptcha?.loadV2Captcha(
-          props.config.V2_SITE_KEY,
-          widgetID,
-          index,
-          reload
-        );
-      }
-    }
-  };
-
   async function sendToken(): Promise<void> {
     if (!shouldAllowSend) {
       return;
@@ -369,14 +287,11 @@ const FaucetForm = (props: any) => {
     try {
       setIsLoading(true);
 
-      const { token, v2Token } = await getCaptchaToken();
-
       let { chain, erc20 } = getChainParams();
 
       const response = await props.axios.post(props.config.api.sendToken, {
         address,
         token,
-        v2Token,
         chain,
         erc20,
       });
@@ -384,8 +299,6 @@ const FaucetForm = (props: any) => {
     } catch (err: any) {
       data = err?.response?.data || err;
     }
-
-    ifCaptchaFailed(data);
 
     setSendTokenResponse({
       txHash: data?.txHash,
@@ -476,25 +389,7 @@ const FaucetForm = (props: any) => {
     </div>
   );
 
-  const TokenDropdown = () => (
-    <div style={{ width: "100%" }}>
-      <Select
-        options={tokenOptions}
-        value={getTokenOptionByValue(token)}
-        onChange={updateToken}
-        styles={customStyles}
-        getOptionValue={(option: any) => option.search}
-      />
-    </div>
-  );
-
-  const resetRecaptcha = (): void => {
-    setIsV2(false);
-    recaptcha!.resetV2Captcha(widgetID);
-  };
-
   const back = (): void => {
-    resetRecaptcha();
     setSendTokenResponse({
       txHash: null,
       message: null,
@@ -509,6 +404,12 @@ const FaucetForm = (props: any) => {
   };
 
   const verifyTweet = async () => {
+    setVerified(false);
+    setVerificationStatus({
+      err: false,
+      verified: false,
+    });
+
     try {
       const response = await props.axios.post(props.config.api.verifyTweet, {
         tweetLink: twitterLink,
@@ -516,11 +417,17 @@ const FaucetForm = (props: any) => {
       });
 
       if (response.data.verified) {
-        console.log("yayyy it works");
-        // Handle successful verification e.g., allow the sendToken action
+        setVerified(true);
+        setVerificationStatus({
+          err: false,
+          verified: true,
+        });
       } else {
-        console.log("verification failed");
-        // Handle verification failure
+        setVerified(false);
+        setVerificationStatus({
+          err: true,
+          verified: false,
+        });
       }
     } catch (error) {
       console.error("Error verifying tweet:", error);
@@ -551,13 +458,31 @@ const FaucetForm = (props: any) => {
                 type="text"
                 value={twitterLink}
                 onChange={(e) => setTwitterLink(e.target.value)}
-                placeholder="Twitter post link..."
+                placeholder="Tweet link..."
                 className="twitter-link-input"
               />
             </div>
-            <button onClick={verifyTweet} className="verify-button">
+            <button
+              disabled={
+                !/http(?:s)?:\/\/(?:www\.)?twitter\.com\/([a-zA-Z0-9_]+)/.test(
+                  twitterLink
+                )
+              }
+              onClick={verifyTweet}
+              className="verify-button"
+            >
               Verify
             </button>
+            {verificationStatus.err && (
+              <span className="rate-limit-text" style={{ color: "red" }}>
+                Error verifying Tweet
+              </span>
+            )}
+            {!verificationStatus.err && verificationStatus.verified && (
+              <span className="rate-limit-text" style={{ color: "#08da08" }}>
+                Successfully verified Tweet
+              </span>
+            )}
           </div>
         </div>
         <div className="box-content">
@@ -594,14 +519,6 @@ const FaucetForm = (props: any) => {
           <div
             style={{ display: sendTokenResponse?.txHash ? "none" : "block" }}
           >
-            {/* <p className="rate-limit-text">
-              Drops are limited to
-              <span>
-                {chainConfigs[token!]?.RATELIMIT?.MAX_LIMIT} request in{" "}
-                {toString(chainConfigs[token!]?.RATELIMIT?.WINDOW_SIZE)}.
-              </span>
-            </p> */}
-
             <div className="address-input">
               <input
                 placeholder="Hexadecimal Address (0x...)"

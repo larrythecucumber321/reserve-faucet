@@ -52,12 +52,6 @@ new RateLimiter(app, [...evmchains, ...erc20tokens], (req: any, res: any) => {
   }
 });
 
-const captcha: VerifyCaptcha = new VerifyCaptcha(
-  app,
-  process.env.CAPTCHA_SECRET!,
-  process.env.V2_CAPTCHA_SECRET!
-);
-
 let evms = new Map<string, EVMInstanceAndConfig>();
 
 // Get the complete config object from the array of config objects (chains) with ID as id
