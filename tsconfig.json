@@ -10,7 +10,6 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "resolveJsonModule": true,
-        "allowSyntheticDefaultImports": true
     },
     "include": [
         "./**/*.ts"

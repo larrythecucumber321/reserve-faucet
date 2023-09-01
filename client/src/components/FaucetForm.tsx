@@ -186,9 +186,11 @@ const FaucetForm = (props: any) => {
 
   // API calls
   async function updateChainConfigs(): Promise<void> {
+    console.log(props.config.api.getChainConfigs);
     const response: AxiosResponse = await props.axios.get(
       props.config.api.getChainConfigs
     );
+    console.log(response);
     setChainConfigs(response?.data?.configs);
   }
 
@@ -419,6 +421,7 @@ const FaucetForm = (props: any) => {
       console.error("Error verifying tweet:", error);
     }
   };
+
   return (
     <div className="container">
       <div className="box">
@@ -551,7 +554,7 @@ const FaucetForm = (props: any) => {
                 <a
                   target={"_blank"}
                   href={
-                    chainConfigs[token!]?.EXPLORER +
+                    chainConfigs[chain!]?.EXPLORER +
                     "/tx/" +
                     sendTokenResponse?.txHash
                   }

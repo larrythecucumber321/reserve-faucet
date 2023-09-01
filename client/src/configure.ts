@@ -11,11 +11,11 @@ export default axios.create({
 
 export const config = {
   api: {
-    sendToken: "/sendToken",
-    getChainConfigs: "/getChainConfigs",
-    getBalance: "/getBalance",
-    faucetAddress: "faucetAddress",
-    verifyTweet: "/verifyTweet",
+    sendToken: "api/sendToken",
+    getChainConfigs: "api/getChainConfigs",
+    getBalance: "api/getBalance",
+    faucetAddress: "api/faucetAddress",
+    verifyTweet: "api/verifyTweet",
   },
   SITE_KEY: configurations.CAPTCHA.siteKey,
   V2_SITE_KEY: configurations.CAPTCHA.v2siteKey,

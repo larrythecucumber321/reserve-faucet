@@ -260,22 +260,8 @@ app.get("/ip", (req: any, res: any) => {
   });
 });
 
-app.get("*", async (req: any, res: any) => {
-  const chain = req.query.subnet;
-  const erc20 = req.query.erc20;
-  if (NATIVE_CLIENT) {
-    res.sendFile(path.join(__dirname, "client", "index.html"));
-  } else {
-    res.redirect(
-      `https://core.app/tools/testnet-faucet${
-        chain ? "?subnet=" + chain + (erc20 ? "&token=" + erc20 : "") : ""
-      }`
-    );
-  }
+app.listen(process.env.PORT || 8000, () => {
+  console.log(`Server started at port ${process.env.PORT || 8000}`);
 });
-
-// app.listen(process.env.PORT || 8000, () => {
-//   console.log(`Server started at port ${process.env.PORT || 8000}`);
-// });
 
 module.exports.handler = serverless(app);
