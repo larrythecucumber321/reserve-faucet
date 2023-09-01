@@ -126,14 +126,6 @@ export default class EVM {
     hashedName: string,
     cb: (param: SendTokenResponse) => void
   ): Promise<void> {
-    if (this.blockFaucetDrips) {
-      cb({
-        status: 400,
-        message: "Faucet is getting started! Please try after sometime",
-      });
-      return;
-    }
-
     if (this.error) {
       cb({
         status: 400,

@@ -1,0 +1,30 @@
+service: reserve-faucet
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: dev
+  region: us-west-1
+functions:
+  app:
+    handler: build/server.handler
+    events:
+      - http:
+          path: /
+          method: ANY
+          cors: true
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
+package:
+  excludeDevDependencies: true
+  include:
+    - src/**
+  exclude:
+    - test/**
+    - .git/**
+    - .vscode/**
+    - client/**

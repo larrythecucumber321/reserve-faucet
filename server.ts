@@ -1,10 +1,10 @@
 import express from "express";
 import cors from "cors";
 import path from "path";
-import dotenv from "dotenv";
 import { BN } from "avalanche";
 import { URL } from "url";
 import { Client } from "twitter-api-sdk";
+import serverless from "serverless-http";
 
 import { RateLimiter, VerifyCaptcha, parseBody, parseURI } from "./middlewares";
 import EVM from "./vms/evm";
@@ -23,14 +23,8 @@ import {
   NATIVE_CLIENT,
   DEBUG,
 } from "./config.json";
-import {
-  TwitterNextToken,
-  TwitterPaginatedResponse,
-  TwitterResponse,
-  usersIdTweets,
-} from "twitter-api-sdk/dist/types";
 
-dotenv.config();
+require("dotenv").config();
 
 const twitterClient = new Client(process.env.TWITTER_BEARER_TOKEN!);
 
@@ -280,6 +274,8 @@ app.get("*", async (req: any, res: any) => {
   }
 });
 
-app.listen(process.env.PORT || 8000, () => {
-  console.log(`Server started at port ${process.env.PORT || 8000}`);
-});
+// app.listen(process.env.PORT || 8000, () => {
+//   console.log(`Server started at port ${process.env.PORT || 8000}`);
+// });
+
+module.exports.handler = serverless(app);
