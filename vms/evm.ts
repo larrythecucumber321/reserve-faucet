@@ -152,7 +152,7 @@ export default class EVM {
     this.requestCount++;
 
     const tokenAmounts = [];
-    for (let { config } of this.contracts.values()) {
+    for (const { config } of this.contracts.values()) {
       tokenAmounts.push({
         address: config.CONTRACTADDRESS,
         amount: calculateBaseUnit(
@@ -279,7 +279,7 @@ export default class EVM {
 
   async fetchERC20Balance(): Promise<void> {
     this.contracts.forEach(async (contract: any) => {
-      let balance = new BN(0);
+      const balance = new BN(0);
       try {
         await contract.methods.balanceOf(this.account.address).call();
       } catch (err: any) {}
@@ -322,7 +322,6 @@ export default class EVM {
   }
 
   balanceCheck(req: RequestType): Boolean {
-    const balance: BN = this.getBalance(req.id);
     if (req.id && this.contracts.get(req.id)) {
       if (this.contracts.get(req.id).balance.gte(req.amount)) {
         this.contracts.get(req.id).balance = this.contracts
@@ -435,8 +434,8 @@ export default class EVM {
     };
 
     if (this.LEGACY) {
-      delete tx["maxPriorityFeePerGas"];
-      delete tx["maxFeePerGas"];
+      delete tx.maxPriorityFeePerGas;
+      delete tx.maxFeePerGas;
       tx.gasPrice = await this.getAdjustedGasPrice();
       tx.type = 0;
     }

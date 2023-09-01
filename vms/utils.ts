@@ -1,11 +1,11 @@
-import { BN } from 'avalanche'
+import { BN } from 'avalanche';
 
 export function calculateBaseUnit(amount: string, decimals: number): BN {
     for(let i = 0; i < decimals; i++) {
-        amount += "0"
+        amount += "0";
     }
 
-    return new BN(amount)
+    return new BN(amount);
 }
 
 export const asyncCallWithTimeout = async (asyncPromise: Promise<void>, timeLimit: number, timeoutMessage: string) => {
@@ -21,5 +21,5 @@ export const asyncCallWithTimeout = async (asyncPromise: Promise<void>, timeLimi
     return Promise.race([asyncPromise, timeoutPromise]).then(result => {
         clearTimeout(timeoutHandle);
         return result;
-    })
-}
+    });
+};

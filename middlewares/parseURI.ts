@@ -1,17 +1,17 @@
 import bodyParser from "body-parser";
 
 export const parseURI = (req: any, res: any, next: any) => {
-    var err = null;
+    let err = null;
     try {
-        decodeURIComponent(req.path)
+        decodeURIComponent(req.path);
     } catch(e) {
-        err = e
+        err = e;
     }
     if(err) {
-        return res.redirect('/')    
+        return res.redirect('/');    
     }
     next();
-}
+};
 
 export const parseBody = (req: any, res: any, next: () => void) => {
     bodyParser.json()(req, res, (error) => {
@@ -21,4 +21,4 @@ export const parseBody = (req: any, res: any, next: () => void) => {
             next();
         }
     });
-}
+};

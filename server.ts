@@ -6,7 +6,7 @@ import { URL } from "url";
 import { Client } from "twitter-api-sdk";
 import serverless from "serverless-http";
 
-import { RateLimiter, VerifyCaptcha, parseBody, parseURI } from "./middlewares";
+import { RateLimiter, parseBody, parseURI } from "./middlewares";
 import EVM from "./vms/evm";
 
 import {
@@ -52,7 +52,7 @@ new RateLimiter(app, [...evmchains, ...erc20tokens], (req: any, res: any) => {
   }
 });
 
-let evms = new Map<string, EVMInstanceAndConfig>();
+const evms = new Map<string, EVMInstanceAndConfig>();
 
 // Get the complete config object from the array of config objects (chains) with ID as id
 const getChainByID = (
