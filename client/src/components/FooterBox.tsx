@@ -25,20 +25,7 @@ export default function FooterBox(props: any) {
     <div className="container">
       <div className="footer-box">
         <div style={{ fontSize: "13px", padding: "20px" }}>
-          Use the buttons below to add{" "}
-          <b>{props.chainConfigs[props.chain!]?.NAME}</b> to your browser wallet
-          extension or visit the Subnet's block explorer.
-          <AddNetwork
-            config={props.chainConfigs[props.chain!]}
-            token={props.chainConfigs[props.token!]}
-          />
-        </div>
-      </div>
-
-      <div className="footer-box">
-        <div style={{ fontSize: "13px", padding: "20px" }}>
-          Once you are done with the testing, feel free to send the remaining
-          coins to the following faucet address.
+          Feel free to send unused tokens to the following faucet address.
           <div
             className="return-address"
             onMouseOut={outFunc}

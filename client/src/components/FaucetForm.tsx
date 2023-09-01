@@ -107,7 +107,7 @@ const FaucetForm = (props: any) => {
         <div className="select-dropdown">
           <img alt={chain.NAME[0]} src={chain.IMAGE} />
           <strong>
-            {(chain.ID = ch ? chain.TOKEN : `${chain.DRIP_AMOUNT}`)}{" "}
+            {chain.ID === ch ? chain.TOKEN : `${chain.DRIP_AMOUNT}`}{" "}
           </strong>{" "}
           &nbsp;
           <a
@@ -422,7 +422,7 @@ const FaucetForm = (props: any) => {
         <div className="box-content">
           <div>
             <p className="tweet-step-instruction">
-              Step 1: Tweet the following content:
+              Step 1: Tweet the following content
             </p>
             <button onClick={handleTweet} className="tweet-button">
               Tweet
@@ -430,7 +430,7 @@ const FaucetForm = (props: any) => {
           </div>
           <div>
             <p className="tweet-step-instruction">
-              Step 2: Paste the link to your tweet to verify:
+              Step 2: Paste the link to your tweet to verify
             </p>
             <div className="address-input">
               <input
@@ -464,10 +464,11 @@ const FaucetForm = (props: any) => {
             )}
           </div>
         </div>
-        <div className="box-content">
+        <div className="box-content" style={{ paddingTop: "0px" }}>
           <div className="box-header">
+            <p className="tweet-step-instruction">Step 3: Claim funds</p>
             <span>
-              <span style={{ color: "#f9eddd" }}>Select Network</span>
+              <span style={{ color: "#f9eddd" }}>Network</span>
             </span>
             <ChainDropdown /> <br />
             <div>

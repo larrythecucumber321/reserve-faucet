@@ -18,7 +18,6 @@ functions:
           cors: true
 plugins:
   - serverless-offline
-  - serverless-dotenv-plugin
 package:
   excludeDevDependencies: true
   include:
