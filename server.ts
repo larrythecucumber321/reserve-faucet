@@ -121,7 +121,7 @@ router.post("/verifyTweet", async (req: any, res: any) => {
     let data: any;
 
     try {
-      data = await twitterClient.tweets.findTweetById(tweetId);
+      ({ data } = await twitterClient.tweets.findTweetById(tweetId));
     } catch (error) {
       if ((error as any).response?.status === 429) {
         // Handling rate limit
@@ -159,7 +159,6 @@ router.post("/verifyTweet", async (req: any, res: any) => {
       }
     }
 
-    console.log("got thru", data);
     const firstLineOfPreWrittenTweet = req.body.preWrittenTweet
       .split("\n")[0]
       .trim();
@@ -184,7 +183,7 @@ router.post("/verifyTweet", async (req: any, res: any) => {
 router.post("/sendToken", async (req: any, res: any) => {
   const address: string = req.body?.address;
   const chain: string = req.body?.chain;
-  const erc20: string | undefined = req.body?.erc20;
+  const hash: string = req.body?.hashedName;
 
   const evm: EVMInstanceAndConfig = evms.get(chain)!;
 
@@ -195,12 +194,10 @@ router.post("/sendToken", async (req: any, res: any) => {
         address,
         "chain:",
         chain,
-        "erc20:",
-        erc20,
         "ip:",
         req.headers["cf-connecting-ip"] || req.ip
       );
-    evm?.instance.sendToken(address, erc20, (data: SendTokenResponse) => {
+    evm?.instance.sendToken(address, hash, (data: SendTokenResponse) => {
       const { status, message, txHash } = data;
       res.status(status).send({ message, txHash });
     });

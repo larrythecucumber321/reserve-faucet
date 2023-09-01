@@ -123,7 +123,7 @@ export default class EVM {
   // Function to issue transfer transaction. For ERC20 transfers, 'id' will be a string representing ERC20 token ID
   async sendToken(
     receiver: string,
-    id: string | undefined,
+    hashedName: string,
     cb: (param: SendTokenResponse) => void
   ): Promise<void> {
     if (this.blockFaucetDrips) {
@@ -159,19 +159,6 @@ export default class EVM {
     // increasing request count before processing request
     this.requestCount++;
 
-    let amount: BN = this.DRIP_AMOUNT;
-
-    // If id is provided, then it is ERC20 token transfer, so update the amount
-    if (this.contracts.get(id)) {
-      const dripAmount: number = this.contracts.get(id).config.DRIP_AMOUNT;
-      if (dripAmount) {
-        amount = calculateBaseUnit(
-          dripAmount.toString(),
-          this.contracts.get(id).config.DECIMALS || 18
-        );
-      }
-    }
-
     const tokenAmounts = [];
     for (let { config } of this.contracts.values()) {
       tokenAmounts.push({
@@ -183,18 +170,33 @@ export default class EVM {
       });
     }
 
-    const requestId = receiver + id + Math.random().toString();
-
     const multiSend = this.MULTI_SEND;
 
     const multiSendContract = new this.web3.eth.Contract(
       MultiSendInterface,
       multiSend
     );
-    const txData = multiSendContract.methods.multisendToken(
+
+    const twitterUserClaimed = await multiSendContract.methods
+      .hashedNames(hashedName)
+      .call();
+    const addressClaimed = await multiSendContract.methods
+      .claimedAddresses(receiver)
+      .call();
+
+    if (twitterUserClaimed || addressClaimed) {
+      cb({
+        status: 429,
+        message: "You've already claimed. Only one per person",
+      });
+      return;
+    }
+
+    const txData = multiSendContract.methods.multisendTokenWithLogging(
       receiver,
       tokenAmounts.map((x) => x.address),
-      tokenAmounts.map((x) => x.amount)
+      tokenAmounts.map((x) => x.amount),
+      hashedName
     );
 
     const tx: any = {

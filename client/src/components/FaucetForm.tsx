@@ -13,28 +13,27 @@ import { AxiosResponse } from "axios";
 const FaucetForm = (props: any) => {
   const [chain, setChain] = useState<number | null>(null);
   const [token, setToken] = useState<number | null>(null);
-  const [widgetID, setwidgetID] = useState(new Map());
-  const [isV2, setIsV2] = useState<boolean>(false);
   const [chainConfigs, setChainConfigs] = useState<any>([]);
   const [inputAddress, setInputAddress] = useState<string>("");
   const [address, setAddress] = useState<string | null>(null);
   const [faucetAddress, setFaucetAddress] = useState<string | null>(null);
   const [options, setOptions] = useState<DropdownOption[]>([]);
   const [tokenOptions, setTokenOptions] = useState<DropdownOption[]>([]);
-  const [balance, setBalance] = useState<string>("0");
   const [shouldAllowSend, setShouldAllowSend] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isFetchingBalance, setIsFetchingBalance] =
-    useState<AbortController | null>(null);
   const [sendTokenResponse, setSendTokenResponse] = useState<any>({
     txHash: null,
     message: null,
   });
 
-  const [verified, setVerified] = useState<boolean>(false);
-  const [verificationStatus, setVerificationStatus] = useState<any>({
+  const [verificationStatus, setVerificationStatus] = useState<{
+    err: boolean;
+    verified: boolean;
+    hashedName: string;
+  }>({
     err: false,
     verified: false,
+    hashedName: ethers.utils.id(""),
   });
 
   const [twitterLink, setTwitterLink] = useState<string>("");
@@ -50,21 +49,13 @@ const FaucetForm = (props: any) => {
 
   // Make REQUEST button disabled if either address is not valid or balance is low
   useEffect(() => {
-    if (address) {
-      if (
-        BigInt(balance) >
-        calculateBaseUnit(
-          chainConfigs[token!]?.DRIP_AMOUNT,
-          chainConfigs[token!]?.DECIMALS
-        )
-      ) {
-        setShouldAllowSend(true);
-        return;
-      }
+    if (address && verificationStatus.verified) {
+      setShouldAllowSend(true);
+      return;
     }
 
     setShouldAllowSend(false);
-  }, [address, balance]);
+  }, [address, verificationStatus]);
 
   useEffect(() => {
     updateFaucetAddress();
@@ -292,6 +283,7 @@ const FaucetForm = (props: any) => {
       const response = await props.axios.post(props.config.api.sendToken, {
         address,
         token,
+        hashedName: verificationStatus.hashedName,
         chain,
         erc20,
       });
@@ -311,16 +303,6 @@ const FaucetForm = (props: any) => {
   const getOptionByValue = (value: any): DropdownOption => {
     let selectedOption: DropdownOption = options[0];
     options.forEach((option: DropdownOption): void => {
-      if (option.value == value) {
-        selectedOption = option;
-      }
-    });
-    return selectedOption;
-  };
-
-  const getTokenOptionByValue = (value: any): DropdownOption => {
-    let selectedOption: DropdownOption = tokenOptions[0];
-    tokenOptions.forEach((option: DropdownOption): void => {
       if (option.value == value) {
         selectedOption = option;
       }
@@ -404,10 +386,10 @@ const FaucetForm = (props: any) => {
   };
 
   const verifyTweet = async () => {
-    setVerified(false);
     setVerificationStatus({
       err: false,
       verified: false,
+      hashedName: ethers.utils.id(""),
     });
 
     try {
@@ -417,16 +399,20 @@ const FaucetForm = (props: any) => {
       });
 
       if (response.data.verified) {
-        setVerified(true);
+        const urlObj = new URL(twitterLink);
+        const pathSegments = urlObj.pathname.split("/");
+        const userName = pathSegments[pathSegments.length - 3];
+
         setVerificationStatus({
           err: false,
           verified: true,
+          hashedName: ethers.utils.id(userName),
         });
       } else {
-        setVerified(false);
         setVerificationStatus({
           err: true,
           verified: false,
+          hashedName: ethers.utils.id(""),
         });
       }
     } catch (error) {
@@ -543,6 +529,7 @@ const FaucetForm = (props: any) => {
               className={
                 shouldAllowSend ? "send-button" : "send-button-disabled"
               }
+              disabled={!shouldAllowSend}
               onClick={sendToken}
             >
               {isLoading ? (

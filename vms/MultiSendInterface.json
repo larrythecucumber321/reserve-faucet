@@ -1,5 +1,19 @@
 [
   {
+    "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+    "name": "claimedAddresses",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+    "name": "hashedNames",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       { "internalType": "address", "name": "recipient", "type": "address" },
       {
@@ -10,6 +24,22 @@
       { "internalType": "uint256[]", "name": "values", "type": "uint256[]" }
     ],
     "name": "multisendToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "recipient", "type": "address" },
+      {
+        "internalType": "contract IERC20[]",
+        "name": "tokens",
+        "type": "address[]"
+      },
+      { "internalType": "uint256[]", "name": "values", "type": "uint256[]" },
+      { "internalType": "bytes32", "name": "hashedName", "type": "bytes32" }
+    ],
+    "name": "multisendTokenWithLogging",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
