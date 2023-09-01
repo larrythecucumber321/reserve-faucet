@@ -107,7 +107,7 @@ const FaucetForm = (props: any) => {
         <div className="select-dropdown">
           <img alt={chain.NAME[0]} src={chain.IMAGE} />
           <strong>
-            {chain.ID == ch ? chain.TOKEN : `${chain.DRIP_AMOUNT}`}{" "}
+            {(chain.ID = ch ? chain.TOKEN : `${chain.DRIP_AMOUNT}`)}{" "}
           </strong>{" "}
           &nbsp;
           <a
@@ -129,7 +129,7 @@ const FaucetForm = (props: any) => {
         </div>
       );
 
-      if ((chain.CONTRACTADDRESS && chain.HOSTID == ch) || chain.ID == ch) {
+      if ((chain.CONTRACTADDRESS && chain.HOSTID === ch) || chain.ID === ch) {
         newOptions.push({
           label: item,
           value: i,
@@ -150,7 +150,7 @@ const FaucetForm = (props: any) => {
       network = network?.toUpperCase();
 
       chainConfigs.forEach((chain: any, i: number): any => {
-        if (chain.TOKEN == token && chain.HOSTID == network) {
+        if (chain.TOKEN === token && chain.HOSTID === network) {
           selectedConfig = i;
         }
       });
@@ -204,7 +204,7 @@ const FaucetForm = (props: any) => {
   }
 
   async function updateFaucetAddress(): Promise<void> {
-    if ((chain || chain == 0) && chainConfigs.length > 0) {
+    if ((chain || chain === 0) && chainConfigs.length > 0) {
       let { chain } = getChainParams();
 
       const response: AxiosResponse = await props.axios.get(
@@ -222,16 +222,6 @@ const FaucetForm = (props: any) => {
     }
   }
 
-  function calculateBaseUnit(
-    amount: string = "0",
-    decimals: number = 18
-  ): BigInt {
-    for (let i = 0; i < decimals; i++) {
-      amount += "0";
-    }
-    return BigInt(amount);
-  }
-
   function chainToIndex(id: any): number | null {
     if (chainConfigs?.length > 0) {
       if (typeof id == "string") {
@@ -239,7 +229,7 @@ const FaucetForm = (props: any) => {
       }
       let index: number = 0;
       chainConfigs.forEach((chain: any, i: number) => {
-        if (id == chain.ID) {
+        if (id === chain.ID) {
           index = i;
         }
       });
@@ -305,7 +295,7 @@ const FaucetForm = (props: any) => {
   const getOptionByValue = (value: any): DropdownOption => {
     let selectedOption: DropdownOption = options[0];
     options.forEach((option: DropdownOption): void => {
-      if (option.value == value) {
+      if (option.value === value) {
         selectedOption = option;
       }
     });

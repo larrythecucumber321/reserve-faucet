@@ -20,7 +20,7 @@
     "react-scripts": "5.0.1"
   },
   "scripts": {
-    "build": "BUILD_PATH='../build/client' react-scripts build",
+    "build": "BUILD_PATH='../client/build' react-scripts build",
     "dev": "react-scripts start",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
